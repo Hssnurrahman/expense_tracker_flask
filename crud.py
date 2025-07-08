@@ -26,7 +26,7 @@ def get_category(db: Session, category_id: int):
 def get_user_categories(db: Session, user_id: int, skip: int = 0, limit: int = 100):
     return (
         db.query(models.Category)
-        .filter(models.Category.owner_id == user_id)
+        .filter(models.Category.user_id == user_id)
         .offset(skip)
         .limit(limit)
         .all()
@@ -55,17 +55,34 @@ def create_user(db: Session, user: schemas.UserCreate):
         return None
 
 def create_category(db: Session, category: schemas.CategoryCreate, user_id: int):
-    db_category = models.Category(**category.model_dump(), owner_id=user_id)
-    db.add(db_category)
-    db.commit()
-    db.refresh(db_category)
-    return db_category
+    try:
+        # Handle both Pydantic v1 and v2
+        try:
+            category_data = category.model_dump()
+        except AttributeError:
+            category_data = category.dict()
+            
+        db_category = models.Category(**category_data, user_id=user_id)
+        db.add(db_category)
+        db.commit()
+        db.refresh(db_category)
+        return db_category
+    except Exception as e:
+        db.rollback()
+        print(f"Error creating category: {e}")
+        raise
 
 def update_category(
     db: Session, category_id: int, category: schemas.CategoryCreate
 ):
     db_category = get_category(db, category_id=category_id)
-    for key, value in category.model_dump().items():
+    # Handle both Pydantic v1 and v2
+    try:
+        category_data = category.model_dump()
+    except AttributeError:
+        category_data = category.dict()
+        
+    for key, value in category_data.items():
         setattr(db_category, key, value)
 
     db.commit()
@@ -84,22 +101,39 @@ def get_expense(db: Session, expense_id: int):
 def get_user_expenses(db: Session, user_id: int, skip: int = 0, limit: int = 100):
     return (
         db.query(models.Expense)
-        .filter(models.Expense.owner_id == user_id)
+        .filter(models.Expense.user_id == user_id)
         .offset(skip)
         .limit(limit)
         .all()
     )
 
 def create_expense(db: Session, expense: schemas.ExpenseCreate, user_id: int):
-    db_expense = models.Expense(**expense.model_dump(), owner_id=user_id)
-    db.add(db_expense)
-    db.commit()
-    db.refresh(db_expense)
-    return db_expense
+    try:
+        # Handle both Pydantic v1 and v2
+        try:
+            expense_data = expense.model_dump()
+        except AttributeError:
+            expense_data = expense.dict()
+            
+        db_expense = models.Expense(**expense_data, user_id=user_id)
+        db.add(db_expense)
+        db.commit()
+        db.refresh(db_expense)
+        return db_expense
+    except Exception as e:
+        db.rollback()
+        print(f"Error creating expense: {e}")
+        raise
 
 def update_expense(db: Session, expense_id: int, expense: schemas.ExpenseCreate):
     db_expense = get_expense(db, expense_id=expense_id)
-    for key, value in expense.model_dump().items():
+    # Handle both Pydantic v1 and v2
+    try:
+        expense_data = expense.model_dump()
+    except AttributeError:
+        expense_data = expense.dict()
+        
+    for key, value in expense_data.items():
         setattr(db_expense, key, value)
     db.commit()
     db.refresh(db_expense)

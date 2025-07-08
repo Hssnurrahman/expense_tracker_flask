@@ -21,7 +21,7 @@ class Category(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     description = Column(String, nullable=True)
-    owner_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="categories")
     expenses = relationship("Expense", back_populates="category")
@@ -35,7 +35,7 @@ class Expense(Base):
     description = Column(String, nullable=True)
     date = Column(Date, nullable=False)
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
-    owner_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
 
     category = relationship("Category", back_populates="expenses")
     owner = relationship("User", back_populates="expenses")

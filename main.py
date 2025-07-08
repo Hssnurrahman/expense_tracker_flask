@@ -478,8 +478,8 @@ def read_expense(
                 status_code=404, 
                 detail=f"Expense with ID {expense_id} not found. Please check if the expense exists and you have permission to access it."
             )
-        if expense.owner_id != current_user.id:
-            logger.warning(f"Unauthorized access attempt: User {current_user.username} tried to access expense {expense_id} owned by user {expense.owner_id}")
+        if expense.user_id != current_user.id:
+            logger.warning(f"Unauthorized access attempt: User {current_user.username} tried to access expense {expense_id} owned by user {expense.user_id}")
             raise HTTPException(
                 status_code=403, 
                 detail=f"Access denied. Expense {expense_id} belongs to another user. You can only access your own expenses."
@@ -510,8 +510,8 @@ def update_expense(
                 status_code=404, 
                 detail=f"Cannot update expense {expense_id} - expense not found. Please verify the expense ID exists."
             )
-        if db_expense.owner_id != current_user.id:
-            logger.warning(f"Update unauthorized: User {current_user.username} tried to update expense {expense_id} owned by user {db_expense.owner_id}")
+        if db_expense.user_id != current_user.id:
+            logger.warning(f"Update unauthorized: User {current_user.username} tried to update expense {expense_id} owned by user {db_expense.user_id}")
             raise HTTPException(
                 status_code=403, 
                 detail=f"Update denied. Expense {expense_id} belongs to another user. You can only update your own expenses."
@@ -543,8 +543,8 @@ def delete_expense(
                 status_code=404, 
                 detail=f"Cannot delete expense {expense_id} - expense not found. Please verify the expense ID exists."
             )
-        if db_expense.owner_id != current_user.id:
-            logger.warning(f"Delete unauthorized: User {current_user.username} tried to delete expense {expense_id} owned by user {db_expense.owner_id}")
+        if db_expense.user_id != current_user.id:
+            logger.warning(f"Delete unauthorized: User {current_user.username} tried to delete expense {expense_id} owned by user {db_expense.user_id}")
             raise HTTPException(
                 status_code=403, 
                 detail=f"Delete denied. Expense {expense_id} belongs to another user. You can only delete your own expenses."

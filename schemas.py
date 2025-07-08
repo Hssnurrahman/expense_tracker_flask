@@ -32,7 +32,7 @@ class CategoryCreate(CategoryBase):
 
 class Category(CategoryBase):
     id: int
-    owner_id: int
+    user_id: int
 
     class Config:
         from_attributes = True
@@ -52,7 +52,7 @@ class ExpenseCreate(ExpenseBase):
 
 class Expense(ExpenseBase):
     id: int
-    owner_id: int
+    user_id: int
 
     class Config:
         from_attributes = True
